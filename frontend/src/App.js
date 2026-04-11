@@ -36,7 +36,7 @@ function App() {
 
   // 📌 GET TASKS
   const fetchTasks = async () => {
-    const res = await axios.get("http://localhost:5000/api/tasks");
+    const res = await axios.get(API);
     setTasks(res.data);
   };
 
