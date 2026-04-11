@@ -32,7 +32,7 @@ function App() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const API = "http://localhost:5000/api/tasks";
+  const API = "https://your-render-url.onrender.com/api/tasks";
 
   // 📌 GET TASKS
   const fetchTasks = async () => {
