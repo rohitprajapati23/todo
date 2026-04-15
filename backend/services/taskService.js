@@ -1,21 +1,87 @@
 const Task = require("../models/Task");
 
-exports.createTask = (data) => Task.create(data);
 
-exports.getTasks = () => Task.find();
+async function createTask(data) {
+    try {
+        if (!data.title) {
+            throw new Error("Title is required");
+        }
 
-exports.getTaskById = (id) => Task.findById(id);
+        const newTask = new Task({
+            title: data.title,
+            description: data.description
+        });
 
-exports.updateTask = (id, data) =>
-  Task.findByIdAndUpdate(id, data, { new: true });
+        const savedTask = await newTask.save();
+        return savedTask;
 
-exports.deleteTask = (id) =>
-  Task.findByIdAndDelete(id);
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
 
-// 🔍 SEARCH
-exports.searchTasks = (query) =>
-  Task.find({ title: { $regex: query, $options: "i" } });
 
-// 🔁 STATUS UPDATE
-exports.updateStatus = (id, completed) =>
-  Task.findByIdAndUpdate(id, { completed }, { new: true });
+async function getTasks() {
+    try {
+        const tasks = await Task.find();
+        return tasks;
+    } catch (error) {
+        throw new Error("Unable to fetch tasks");
+    }
+}
+
+
+async function getTaskById(id) {
+    try {
+        const task = await Task.findById(id);
+
+        if (!task) {
+            throw new Error("Task not found");
+        }
+
+        return task;
+    } catch (error) {
+        throw new Error("Error getting task");
+    }
+}
+
+
+async function updateTask(id, data) {
+    try {
+        const updated = await Task.findByIdAndUpdate(
+            id,
+            data,
+            { new: true }
+        );
+
+        if (!updated) {
+            throw new Error("Task not found");
+        }
+
+        return updated;
+    } catch (error) {
+        throw new Error("Error updating task");
+    }
+}
+
+async function deleteTask(id) {
+    try {
+        const deleted = await Task.findByIdAndDelete(id);
+
+        if (!deleted) {
+            throw new Error("Task not found");
+        }
+
+        return deleted;
+    } catch (error) {
+        throw new Error("Error deleting task");
+    }
+}
+
+module.exports = {
+    createTask,
+    getTasks,
+    getTaskById,
+    updateTask,
+    deleteTask
+};
