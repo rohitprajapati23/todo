@@ -32,11 +32,11 @@ function App() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const API = "http://localhost:5000/api/tasks";
+  const API = "https://todo-4pez.onrender.com/api/tasks";
 
   // 📌 GET TASKS
   const fetchTasks = async () => {
-    const res = await axios.get("http://localhost:5000/api/tasks");
+    const res = await axios.get(API);
     setTasks(res.data);
   };
 
