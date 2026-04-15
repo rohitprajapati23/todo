@@ -15,7 +15,7 @@ function App() {
   const [error, setError] = useState("");
 
   
-  const API = "https://todo-1-t6la.onrender.com";
+  const API = "https://todo-1-t6la.onrender.com/api/tasks";
 
   
   const fetchTasks = async () => {
