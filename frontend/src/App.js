@@ -1,103 +1,136 @@
-// import logo from './logo.svg';
-// import './App.css';
-
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 function App() {
+
+  
   const [tasks, setTasks] = useState([]);
+
+  
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const API = "https://todo-1-t6la.onrender.com/api/tasks";
 
-  // 📌 GET TASKS
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  
+  const API = process.env.REACT_APP_API_URL;
+
+  
   const fetchTasks = async () => {
-    const res = await axios.get(API);
-    setTasks(res.data);
+    try {
+      setLoading(true);
+
+      const res = await axios.get(API);
+      setTasks(res.data);
+
+      setError("");
+    } catch (err) {
+      setError("Failed to fetch tasks");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  
   useEffect(() => {
     fetchTasks();
   }, []);
 
-  // ➕ ADD TASK
+  
   const addTask = async () => {
-    if (!title) return alert("Title required");
+    try {
+      if (!title) {
+        alert("Title is required");
+        return;
+      }
 
-    await axios.post(API, {
-      title,
-      description
-    });
+      await axios.post(API, {
+        title: title,
+        description: description
+      });
 
-    setTitle("");
-    setDescription("");
-    fetchTasks();
+      setTitle("");
+      setDescription("");
+
+      fetchTasks();
+
+    } catch (err) {
+      setError("Failed to add task");
+    }
   };
 
-  // ❌ DELETE TASK
+  
   const deleteTask = async (id) => {
-    await axios.delete(`${API}/${id}`);
-    fetchTasks();
+    try {
+      await axios.delete(`${API}/${id}`);
+      fetchTasks();
+    } catch (err) {
+      setError("Failed to delete task");
+    }
   };
 
-  // ✔ TOGGLE COMPLETE
-  const toggleTask = async (task) => {
-    await axios.put(`${API}/${task.id}`, {
-      completed: !task.completed
-    });
 
-    fetchTasks();
+  const toggleTask = async (task) => {
+    try {
+      await axios.put(`${API}/${task._id}`, {
+        completed: !task.completed
+      });
+
+      fetchTasks();
+    } catch (err) {
+      setError("Failed to update task");
+    }
   };
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>📝 To-Do App</h1>
 
+      <h1>Task Manager</h1>
+
+      
+      {loading && <p>Loading...</p>}
+
+     
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      
       <input
-        placeholder="Task Title"
+        type="text"
+        placeholder="Enter title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
       <br /><br />
 
       <input
-        placeholder="Description"
+        type="text"
+        placeholder="Enter description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
       <br /><br />
 
-      <button onClick={addTask}>➕ Add Task</button>
+      <button onClick={addTask}>Add Task</button>
 
       <hr />
 
+     
       {tasks.map((task) => (
-        <div key={task.id} style={{ border: "1px solid black", margin: 10, padding: 10 }}>
-          <h3 style={{ textDecoration: task.completed ? "line-through" : "none" }}>
+        <div
+          key={task._id}
+          style={{
+            border: "1px solid black",
+            margin: "10px",
+            padding: "10px"
+          }}
+        >
+          <h3
+            style={{
+              textDecoration: task.completed ? "line-through" : "none"
+            }}
+          >
             {task.title}
           </h3>
 
@@ -107,11 +140,15 @@ function App() {
             {task.completed ? "Undo" : "Complete"}
           </button>
 
-          <button onClick={() => deleteTask(task.id)} style={{ marginLeft: "10px" }}>
+          <button
+            onClick={() => deleteTask(task._id)}
+            style={{ marginLeft: "10px" }}
+          >
             Delete
           </button>
         </div>
       ))}
+
     </div>
   );
 }
