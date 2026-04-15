@@ -1,45 +1,61 @@
 const taskService = require("../services/taskService");
 
+
 exports.createTask = async (req, res) => {
-  try {
-    const task = await taskService.createTask(req.body);
-    res.status(201).json(task);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+    try {
+        const result = await taskService.createTask(req.body);
+        res.status(201).json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
 };
+
 
 exports.getTasks = async (req, res) => {
-  const tasks = await taskService.getTasks();
-  res.json(tasks);
+    try {
+        const result = await taskService.getTasks();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
 };
+
 
 exports.getTask = async (req, res) => {
-  const task = await taskService.getTaskById(req.params.id);
-  res.json(task);
+    try {
+        const result = await taskService.getTaskById(req.params.id);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
 };
+
 
 exports.updateTask = async (req, res) => {
-  const task = await taskService.updateTask(req.params.id, req.body);
-  res.json(task);
+    try {
+        const result = await taskService.updateTask(req.params.id, req.body);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
 };
+
 
 exports.deleteTask = async (req, res) => {
-  await taskService.deleteTask(req.params.id);
-  res.json({ message: "Deleted" });
-};
-
-// 🔍 SEARCH
-exports.searchTasks = async (req, res) => {
-  const tasks = await taskService.searchTasks(req.query.q);
-  res.json(tasks);
-};
-
-// 🔁 STATUS UPDATE
-exports.updateStatus = async (req, res) => {
-  const task = await taskService.updateStatus(
-    req.params.id,
-    req.body.completed
-  );
-  res.json(task);
+    try {
+        await taskService.deleteTask(req.params.id);
+        res.json({ message: "Task deleted successfully" });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
 };
