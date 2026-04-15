@@ -15,7 +15,7 @@ function App() {
   const [error, setError] = useState("");
 
   
-  const API = process.env.REACT_APP_API_URL;
+  const API = "https://todo-1-t6la.onrender.com";
 
   
   const fetchTasks = async () => {
