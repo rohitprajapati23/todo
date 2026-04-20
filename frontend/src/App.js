@@ -4,17 +4,30 @@ import "./App.css";
 
 function App() {
 
-  const API = "https://todo-1-t6la.onrender.com/api/tasks";
+  const API = process.env.REACT_APP_API_URL;
 
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [search, setSearch] = useState("");
-  const [editId, setEditId] = useState(null);
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+ 
   const fetchTasks = async () => {
-    const res = await axios.get(API);
-    setTasks(res.data);
+    try {
+      setLoading(true);
+
+      const res = await axios.get(API);
+      setTasks(res.data);
+
+      setError("");
+    } catch (err) {
+      setError("Cannot load tasks");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -23,46 +36,70 @@ function App() {
 
   
   const handleSubmit = async () => {
-    if (!title) return alert("Enter title");
+    try {
+      setLoading(true);
 
-    if (editId) {
-      await axios.put(`${API}/${editId}`, { title, description });
-      setEditId(null);
-    } else {
+      if (!title) {
+        alert("Enter title");
+        return;
+      }
+
       await axios.post(API, { title, description });
-    }
 
-    setTitle("");
-    setDescription("");
-    fetchTasks();
+      setTitle("");
+      setDescription("");
+
+      fetchTasks();
+    } catch (err) {
+      setError("Failed to add task");
+    } finally {
+      setLoading(false);
+    }
   };
 
-
+  
   const deleteTask = async (id) => {
-    await axios.delete(`${API}/${id}`);
-    fetchTasks();
+    try {
+      setLoading(true);
+
+      await axios.delete(`${API}/${id}`);
+      fetchTasks();
+    } catch (err) {
+      setError("Delete failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   
   const toggleStatus = async (task) => {
-    await axios.patch(`${API}/${task._id}/status`, {
-      completed: !task.completed
-    });
+    try {
+      setLoading(true);
 
-    fetchTasks();
-  };
+      await axios.patch(`${API}/${task._id}/status`, {
+        completed: !task.completed
+      });
 
- 
-  const editTask = (task) => {
-    setTitle(task.title);
-    setDescription(task.description);
-    setEditId(task._id);
+      fetchTasks();
+    } catch (err) {
+      setError("Update failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   
   const searchTasks = async () => {
-    const res = await axios.get(`${API}/search?q=${search}`);
-    setTasks(res.data);
+    try {
+      setLoading(true);
+
+      const res = await axios.get(`${API}/search?q=${search}`);
+      setTasks(res.data);
+    } catch (err) {
+      setError("Search failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,12 +107,15 @@ function App() {
 
       <h1>Todo App</h1>
 
+      {loading && <p>Loading...</p>}
+      {error && <p className="error">{error}</p>}
+
       <input
         placeholder="Search..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-      <button onClick={searchTasks}>Search</button>
+      <button onClick={searchTasks} disabled={loading}>Search</button>
 
       <br /><br />
 
@@ -91,8 +131,8 @@ function App() {
         onChange={(e) => setDescription(e.target.value)}
       />
 
-      <button onClick={handleSubmit}>
-        {editId ? "Update Task" : "Add Task"}
+      <button onClick={handleSubmit} disabled={loading}>
+        Add Task
       </button>
 
       <hr />
@@ -106,13 +146,13 @@ function App() {
 
           <p>{task.description}</p>
 
-          <button onClick={() => toggleStatus(task)}>
+          <button onClick={() => toggleStatus(task)} disabled={loading}>
             {task.completed ? "Undo" : "Complete"}
           </button>
 
-          <button onClick={() => editTask(task)}>Edit</button>
-
-          <button onClick={() => deleteTask(task._id)}>Delete</button>
+          <button onClick={() => deleteTask(task._id)} disabled={loading}>
+            Delete
+          </button>
 
         </div>
       ))}
