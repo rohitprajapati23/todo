@@ -6,8 +6,11 @@ const validateTask = require("../middleware/validation");
 
 router.post("/", validateTask, controller.createTask);
 router.get("/", controller.getTasks);
-router.get("/:id", controller.getTask);
+router.get("/search", controller.searchTasks);
+
 router.put("/:id", validateTask, controller.updateTask);
+router.patch("/:id/status", controller.updateStatus);
+
 router.delete("/:id", controller.deleteTask);
 
 module.exports = router;
