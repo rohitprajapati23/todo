@@ -2,6 +2,10 @@ const Task = require("../models/Task");
 
 
 async function createTask(data) {
+    if (!data.title) {
+        throw new Error("Title is required");
+    }
+
     const task = new Task({
         title: data.title,
         description: data.description
@@ -17,40 +21,54 @@ async function getTasks() {
 
 
 async function searchTasks(query) {
+    if (!query) {
+        return [];
+    }
+
     return await Task.find({
         title: { $regex: query, $options: "i" }
     });
 }
 
 
-async function getTaskById(id) {
-    return await Task.findById(id);
-}
-
-
 async function updateTask(id, data) {
-    return await Task.findByIdAndUpdate(id, data, { new: true });
+    const task = await Task.findByIdAndUpdate(id, data, { new: true });
+
+    if (!task) {
+        throw new Error("Task not found");
+    }
+
+    return task;
 }
 
 
 async function updateStatus(id, status) {
-    return await Task.findByIdAndUpdate(
+    const task = await Task.findByIdAndUpdate(
         id,
         { completed: status },
         { new: true }
     );
+
+    if (!task) {
+        throw new Error("Task not found");
+    }
+
+    return task;
 }
 
 
 async function deleteTask(id) {
-    return await Task.findByIdAndDelete(id);
+    const task = await Task.findByIdAndDelete(id);
+
+    if (!task) {
+        throw new Error("Task not found");
+    }
 }
 
 module.exports = {
     createTask,
     getTasks,
     searchTasks,
-    getTaskById,
     updateTask,
     updateStatus,
     deleteTask
