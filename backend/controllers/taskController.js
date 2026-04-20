@@ -1,61 +1,68 @@
-const taskService = require("../services/taskService");
+const service = require("../services/taskService");
 
 
 exports.createTask = async (req, res) => {
     try {
-        const result = await taskService.createTask(req.body);
-        res.status(201).json(result);
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        const task = await service.createTask(req.body);
+        res.status(201).json(task);
+    } catch (err) {
+        res.status(500).json({ message: "Error creating task" });
     }
 };
 
 
 exports.getTasks = async (req, res) => {
     try {
-        const result = await taskService.getTasks();
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        const tasks = await service.getTasks();
+        res.json(tasks);
+    } catch (err) {
+        res.status(500).json({ message: "Error fetching tasks" });
     }
 };
 
 
-exports.getTask = async (req, res) => {
+exports.searchTasks = async (req, res) => {
     try {
-        const result = await taskService.getTaskById(req.params.id);
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        const q = req.query.q;
+        const tasks = await service.searchTasks(q);
+        res.json(tasks);
+    } catch (err) {
+        res.status(500).json({ message: "Error searching tasks" });
+    }
+};
+
+
+exports.updateStatus = async (req, res) => {
+    try {
+        const updated = await service.updateStatus(
+            req.params.id,
+            req.body.completed
+        );
+        res.json(updated);
+    } catch (err) {
+        res.status(500).json({ message: "Error updating status" });
     }
 };
 
 
 exports.updateTask = async (req, res) => {
     try {
-        const result = await taskService.updateTask(req.params.id, req.body);
-        res.json(result);
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        const updated = await service.updateTask(
+            req.params.id,
+            req.body
+        );
+        res.json(updated);
+    } catch (err) {
+        res.status(500).json({ message: "Error updating task" });
     }
 };
 
 
 exports.deleteTask = async (req, res) => {
     try {
-        await taskService.deleteTask(req.params.id);
-        res.json({ message: "Task deleted successfully" });
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        await service.deleteTask(req.params.id);
+        res.json({ message: "Deleted" });
+    } catch (err) {
+        res.status(500).json({ message: "Error deleting task" });
     }
 };
