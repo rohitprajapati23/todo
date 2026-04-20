@@ -4,7 +4,7 @@ import "./App.css";
 
 function App() {
 
-  const API = process.env.REACT_APP_API_URL;
+  const API = "https://todo-1-t6la.onrender.com";
 
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
